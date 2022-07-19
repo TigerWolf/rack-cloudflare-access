@@ -1,10 +1,11 @@
 # frozen_string_literal: true
 
-require_relative "lib/rack/cloudflare/access/version"
+# require_relative "lib/cloudflare_access"
+require_relative "lib/rack/cloudflare_access/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rack-cloudflare-access"
-  spec.version = Rack::Cloudflare::Access::VERSION
+  spec.version = Rack::CloudflareAccess::VERSION
   spec.authors = ["Kieran"]
   spec.email = ["TigerWolf@users.noreply.github.com"]
 
@@ -33,6 +34,12 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "jwt", "~> 2.3.0"
+  # spec.add_dependency "activesupport"
+  # spec.add_dependency "rails" # Can we make this optional?
+
+  spec.add_development_dependency("rack-test", "~> 2.0.2")
+  spec.add_development_dependency("rspec", "~> 3.11.0")
+  spec.add_development_dependency("pry")
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

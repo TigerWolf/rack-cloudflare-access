@@ -1,9 +1,6 @@
-# Rack::Cloudflare::Access
+# Rack::CloudflareAccess
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/rack/cloudflare/access`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
-
+This is a rack middleware to add Cloudflare access to your application. https://developers.cloudflare.com/cloudflare-one/ 
 ## Installation
 
 Install the gem and add to the application's Gemfile by executing:
@@ -16,7 +13,7 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+You will need to configure the team url and aud from Cloudflare. 
 
 ## Development
 
@@ -26,7 +23,7 @@ To install this gem onto your local machine, run `bundle exec rake install`. To 
 
 ## Contributing
 
-Bug reports and pull requests are welcome on GitHub at https://github.com/[USERNAME]/rack-cloudflare-access. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/[USERNAME]/rack-cloudflare-access/blob/master/CODE_OF_CONDUCT.md).
+Bug reports and pull requests are welcome on GitHub at https://github.com/TigerWolf/rack-cloudflare-access. This project is intended to be a safe, welcoming space for collaboration, and contributors are expected to adhere to the [code of conduct](https://github.com/TigerWolf/rack-cloudflare-access/blob/master/CODE_OF_CONDUCT.md).
 
 ## License
 
@@ -34,4 +31,16 @@ The gem is available as open source under the terms of the [MIT License](https:/
 
 ## Code of Conduct
 
-Everyone interacting in the Rack::Cloudflare::Access project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/[USERNAME]/rack-cloudflare-access/blob/master/CODE_OF_CONDUCT.md).
+Everyone interacting in the Rack::Cloudflare::Access project's codebases, issue trackers, chat rooms and mailing lists is expected to follow the [code of conduct](https://github.com/TigerWolf/rack-cloudflare-access/blob/master/CODE_OF_CONDUCT.md).
+
+
+# TODO
+
+* Best way configure AUD and Team url - is this going to be when calling the middleware or configuration in the main file
+* Mock out all web requests to Cloudflare (teams url etc)
+* Create JWT cookie on the fly in tests
+
+Version 2
+* Allow for urls to be filtered out (e.g. login)
+* More efficient HTTP library for getting the certs - for now just keep it simple
+* possibly better rails integration? .present? and deep_symbolize_keys! could use quite useful
