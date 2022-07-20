@@ -9,8 +9,10 @@ Gem::Specification.new do |spec|
   spec.authors = ["Kieran"]
   spec.email = ["TigerWolf@users.noreply.github.com"]
 
-  spec.summary = "Add SSO to your application with this Rack Middleware to add Cloudflare Access to your Rack or Rails application"
-  spec.description = "Add SSO to your application with this Rack Middleware to add Cloudflare Access to your Rack or Rails application "
+  spec.summary = "Add SSO to your application with this Rack Middleware to add Cloudflare Access
+   to your Rack or Rails application"
+  spec.description = "Add SSO to your application with this Rack Middleware to add
+  Cloudflare Access to your Rack or Rails application"
   spec.homepage = "https://github.com/TigerWolf/rack-cloudflare-access"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
@@ -20,6 +22,7 @@ Gem::Specification.new do |spec|
   spec.metadata["homepage_uri"] = spec.homepage
   spec.metadata["source_code_uri"] = "https://github.com/TigerWolf/rack-cloudflare-access"
   spec.metadata["changelog_uri"] = "https://github.com/TigerWolf/rack-cloudflare-access/blob/main/CHANGELOG.md"
+  spec.metadata["rubygems_mfa_required"] = "true"
 
   # Specify which files should be added to the gem when it is released.
   # The `git ls-files -z` loads the files in the RubyGem that have been added into git.
@@ -37,9 +40,9 @@ Gem::Specification.new do |spec|
   # spec.add_dependency "activesupport"
   # spec.add_dependency "rails" # Can we make this optional?
 
+  spec.add_development_dependency("pry")
   spec.add_development_dependency("rack-test", "~> 2.0.2")
   spec.add_development_dependency("rspec", "~> 3.11.0")
-  spec.add_development_dependency("pry")
 
   # For more information and examples about making a new gem, check out our
   # guide at: https://bundler.io/guides/creating_gem.html

@@ -2,91 +2,85 @@ require "jwt"
 require "net/http"
 # require 'action_dispatch'
 
-module Rack::CloudflareAccess
-  class AuthError < StandardError; end
+module Rack
+  module CloudflareAccess
+    class AuthError < StandardError; end
 
-  class Middleware
-    def initialize(app, teams_url, aud)
-      @app = app
-      @teams_url = teams_url
-      @aud = aud
-    end
+    class Middleware
+      def initialize(app, teams_url, aud)
+        @app = app
+        @teams_url = teams_url
+        @aud = aud
+      end
 
-    def call(env)
-      verify_token(env)
-    end
+      def call(env)
+        token = get_token(env)
 
-    def verify_token(env)
-      request_cookies =
-        if defined?(ActionDispatch::Request)
-          ::ActionDispatch::Request.new(env).cookies
-        else
-          Rack::Utils.parse_cookies(env)
+        if token.nil? || token.empty? # FIXME: We could use present? or blank? if we included activesupport
+          return error("JWT Cookie not found")
         end
-      token = request_cookies["CF_Authorization"]
 
-      if token.nil? || token.empty? # FIXME: We could use present? or blank? if we included activesupport
-        Rack::CloudflareAccess.logger.info("JWT Cookie not found")
-        return return_error("JWT Cookie not found")
+        payload = decode_token(token)
+
+        email = payload["email"]
+        return error("User #{email} not found") unless email
+
+        env["jwt.email"] = email
+
+        @app.call(env)
       end
 
-      jwk_loader = lambda do |options|
-        @cached_keys = nil if options[:invalidate]
-        @cached_keys ||= keys
+      private
+
+      def decode_token(token)
+        jwk_loader = lambda do |options|
+          @cached_keys = nil if options[:invalidate]
+          @cached_keys ||= keys
+        end
+
+        payload, = JWT.decode(
+          token, nil, true, {
+            nbf_leeway: 30,
+            exp_leeway: 30,
+            iss: cf_teams_url,
+            verify_iss: true,
+            aud: cf_aud,
+            verify_aud: true,
+            verify_iat: true,
+            algorithm: "RS256",
+            jwks: jwk_loader
+          }
+        )
+        payload
       end
 
-      # require "pry"
-      # binding.pry
-      payload, = JWT.decode(
-        token, nil, true, {
-          nbf_leeway: 30,
-          exp_leeway: 30,
-          iss: cf_teams_url,
-          verify_iss: true,
-          aud: cf_aud,
-          verify_aud: true,
-          verify_iat: true,
-          algorithm: "RS256",
-          jwks: jwk_loader
-        }
-      )
-
-      email = payload["email"]
-
-      unless email
-        error = "User #{email} not found"
-        Rack::CloudflareAccess.logger.info(error)
-        return return_error(error)
+      def get_token(env)
+        request_cookies =
+          if defined?(ActionDispatch::Request)
+            ::ActionDispatch::Request.new(env).cookies
+          else
+            Rack::Utils.parse_cookies(env)
+          end
+        request_cookies["CF_Authorization"]
       end
 
-      env["jwt.email"] = email
+      def cf_aud
+        @aud
+      end
 
-      @app.call(env)
-    end
+      def cf_teams_url
+        @teams_url
+      end
 
-    private
+      def keys
+        uri = URI("#{cf_teams_url}/cdn-cgi/access/certs")
+        JSON.parse(Net::HTTP.get(uri)) # .deep_symbolize_keys!
+      end
 
-    def cf_aud
-      # "83a9f5be00d3aab8cea92a4b348120aafa800b2bfbcf18e68a2b22995b7d68e4"
-      # ENV["CF_JWT_AUD"]
-      # Rails.application.secrets.CF_JWT_AUD || ENV['CF_JWT_AUD']
-      @aud
-    end
-
-    def cf_teams_url
-      # "https://rack-tester.cloudflareaccess.com"
-      # ENV["CF_TEAMS_URL"]
-      # Rails.application.secrets.CF_TEAMS_URL || ENV['CF_TEAMS_URL']
-      @teams_url
-    end
-
-    def keys
-      uri = URI("#{cf_teams_url}/cdn-cgi/access/certs")
-      JSON.parse(Net::HTTP.get(uri)) # .deep_symbolize_keys!
-    end
-
-    def return_error(message)
-      raise AuthError, message
+      def error(message)
+        Rack::CloudflareAccess.logger.error message
+        raise AuthError, message
+      end
     end
   end
 end
