@@ -3,7 +3,7 @@ require "net/http"
 # require 'action_dispatch'
 
 module Rack
-  module CloudflareAccess
+  class CloudflareAccess
     class AuthError < StandardError; end
 
     class Middleware
@@ -23,9 +23,14 @@ module Rack
         payload = decode_token(token)
 
         email = payload["email"]
-        return error("User #{email} not found") unless email
+        return error("User not found") unless email # better error message
 
         env["jwt.email"] = email
+
+        subject = payload["sub"]
+        return error("Sub not found") unless subject
+
+        env["jwt.subject"] = subject
 
         @app.call(env)
       end
@@ -47,6 +52,7 @@ module Rack
             aud: cf_aud,
             verify_aud: true,
             verify_iat: true,
+            verify_sub: true, # Is this needed?
             algorithm: "RS256",
             jwks: jwk_loader
           }
@@ -61,7 +67,7 @@ module Rack
           else
             Rack::Utils.parse_cookies(env)
           end
-        request_cookies["CF_Authorization"]
+        request_cookies["CF_Authorization"] # nil? will each of them return a hash or something else
       end
 
       def cf_aud

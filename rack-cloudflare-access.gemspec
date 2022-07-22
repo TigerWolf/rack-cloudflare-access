@@ -1,7 +1,6 @@
-# frozen_string_literal: true
-
-# require_relative "lib/cloudflare_access"
-require_relative "lib/rack/cloudflare_access/version"
+lib = File.expand_path("lib", __dir__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require "cloudflare_access/version"
 
 Gem::Specification.new do |spec|
   spec.name = "rack-cloudflare-access"
@@ -31,7 +30,6 @@ Gem::Specification.new do |spec|
       (f == __FILE__) || f.match(%r{\A(?:(?:bin|test|spec|features)/|\.(?:git|travis|circleci)|appveyor)})
     end
   end
-  spec.bindir = "exe"
   spec.executables = spec.files.grep(%r{\Aexe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 

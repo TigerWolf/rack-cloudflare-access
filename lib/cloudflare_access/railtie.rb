@@ -1,8 +1,8 @@
 module Rack
-  module CloudflareAccess
+  class CloudflareAccess
     class Railtie < ::Rails::Railtie
       config.action_dispatch.rescue_responses.merge!(
-        "CloudflareAccess::AuthError" => :unauthorized
+        "Rack::CloudflareAccess::AuthError" => :unauthorized
       )
 
       ## Future Improvement opportunity

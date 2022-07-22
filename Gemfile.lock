@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    rack-cloudflare-access (0.1.0)
+    rack-cloudflare-access (0.1.13)
       jwt (~> 2.3.0)
 
 GEM

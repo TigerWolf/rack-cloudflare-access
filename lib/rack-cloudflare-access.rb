@@ -1,10 +1,11 @@
-require_relative "rack/cloudflare_access/version"
-require "rack/cloudflare_access/railtie" if defined?(::Rails::Railtie)
-require "rack/cloudflare_access/middleware"
 require "logger"
 
+require "cloudflare_access/middleware"
+require "cloudflare_access/version"
+require "cloudflare_access/railtie" if defined?(::Rails::Railtie)
+
 module Rack
-  module CloudflareAccess
+  class CloudflareAccess
     class << self
       def logger
         @logger ||= defined?(Rails) ? Rails.logger : ::Logger.new($stdout)

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module Rack
-  module CloudflareAccess
-    VERSION = "0.1.0"
+  class CloudflareAccess
+    VERSION = "0.1.13"
   end
 end

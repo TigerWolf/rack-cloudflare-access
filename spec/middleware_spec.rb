@@ -4,6 +4,7 @@ require "spec_helper"
 require "open3"
 require "stringio"
 require "support/mock_rack_app"
+require "securerandom"
 
 RSpec.describe "when used as middleware", type: :request do
   let(:teams_url) { "http://cloudflare.teamurl.com" }
@@ -34,7 +35,12 @@ RSpec.describe "when used as middleware", type: :request do
       set_cookie "CF_Authorization=aaaa"
     end
     it "returns a JWT DecodeError" do
-      expect { get "/home" }.to raise_error(JWT::DecodeError)
+      expect { get "/home" }.to raise_error(JWT::DecodeError) # Auth error? Maybe we should catch and re-raise
+
+      # TODO: Handle expired tokens
+      # https://github.com/jwt/ruby-jwt/blob/master/lib/jwt/error.rb
+
+      # ExpiredSignature ? rescue JWT::ExpiredSignature
     end
   end
 
@@ -54,8 +60,10 @@ RSpec.describe "when used as middleware", type: :request do
       { kid: jwk.kid }
     end
 
+    let(:subject) { SecureRandom.uuid }
+
     let(:jwt_payload) do
-      { email: "test@example.com", aud: jwt_aud,
+      { email: "test@example.com", aud: jwt_aud, sub: subject,
         iss: jwt_teams_url }
     end
 
@@ -92,7 +100,10 @@ RSpec.describe "when used as middleware", type: :request do
       it "validates the JWT and saves the email in the rack env" do
         middleware.call(env)
         expect(app["jwt.email"]).to eq("test@example.com")
+        expect(app["jwt.subject"]).to eq(subject)
       end
     end
+
+    # Test for invalid signature - forging this. Different certificate or kid.
   end
 end
